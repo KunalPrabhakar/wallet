@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const zod = require("zod");
-const { User } = require("../db");
+const { User, Account } = require("../db");
 const signupBody = zod.object({
   username: zod.string(),
   firstName: zod.string(),
@@ -31,6 +31,10 @@ router.post("/signup", async (req, res) => {
     password: req.body.password,
   });
   const userId = user._id;
+  await Account.create({
+    userId: userId,
+    balance: (10 * Math.random() * 1000).toFixed(2),
+  });
   res.json({
     message: "Successfully registered",
   });
