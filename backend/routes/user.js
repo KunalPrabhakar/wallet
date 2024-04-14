@@ -9,7 +9,15 @@ const signupBody = zod.object({
   lastName: zod.string(),
   password: zod.string(),
 });
-
+const signinBody = zod.object({
+  username: zod.string(),
+  password: zod.string(),
+});
+const updateBody = zod.object({
+  password: zod.string().optional(),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
+});
 router.post("/signup", async (req, res) => {
   const { success } = signupBody.safeParse(req.body);
   // console.log(success, "lastName");
@@ -27,4 +35,21 @@ router.post("/signup", async (req, res) => {
     message: "Successfully registered",
   });
 });
+
+router.post("/signin", async (req, res) => {
+  const { success } = signinBody.safeParse(req.body);
+  if (!success) {
+    res.status(411).json({ message: "Not valid" });
+  }
+  const user = await User.findOne({
+    username: req.body.username,
+    password: req.body.password,
+  });
+  const userId = user._id;
+
+  if (user) {
+    res.json({ message: "Sign In Successfully" });
+  }
+});
+
 module.exports = router;
