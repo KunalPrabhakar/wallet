@@ -36,6 +36,7 @@ router.post("/signup", async (req, res) => {
     balance: (10 * Math.random() * 1000).toFixed(2),
   });
   res.json({
+    userId,
     message: "Successfully registered",
   });
 });
@@ -52,8 +53,35 @@ router.post("/signin", async (req, res) => {
   const userId = user._id;
 
   if (user) {
-    res.json({ message: "Sign In Successfully" });
+    res.json({ userId, message: "Sign In Successfully" });
   }
+});
+
+router.get("/bulk", async (req, res) => {
+  const filter = req.query.filter || "";
+  const users = await User.find({
+    $or: [
+      {
+        firstName: {
+          $regex: filter,
+        },
+      },
+      {
+        lastName: {
+          $regex: filter,
+        },
+      },
+    ],
+  });
+
+  res.json({
+    user: users.map((user) => ({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      _id: user._id,
+    })),
+  });
 });
 
 module.exports = router;
